@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message protobufMessage {
+    string content = 1;
+    string ip = 2;
+}

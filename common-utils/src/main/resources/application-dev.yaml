@@ -1,0 +1,29 @@
+server:
+  port: 8099
+
+kafka:
+  bootstrap:
+    servers: 127.0.0.1:9092
+  group:
+    id:groupA
+  enable:
+    auto:
+      commit: true
+  auto:
+    commit:
+      interval:
+        ms: 1000
+    offset:
+      reset: earliest
+  session:
+    timeout:
+      ms: 30000
+  max:
+    poll:
+      records: 1000
+  key:
+    deserializer: org.apache.kafka.common.serialization.StringSerializer
+  value:
+    deserializer: org.apache.kafka.common.serialization.StringSerializer
+
+

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ddd</artifactId>
+        <groupId>com.foundation</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ddd-cart</artifactId>
+
+    <modules>
+        <module>ddd-cart-client</module>
+        <module>ddd-cart-core</module>
+    </modules>
+
+    <properties>
+        <cart-client.version>0.0.1-SNAPSHOT</cart-client.version>
+        <cart-core.version>0.0.1-SNAPSHOT</cart-core.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <artifactId>ddd-cart-client</artifactId>
+                <groupId>com.foundation</groupId>
+                <version>${cart-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <artifactId>ddd-cart-core</artifactId>
+                <groupId>com.foundation</groupId>
+                <version>${cart-core.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
