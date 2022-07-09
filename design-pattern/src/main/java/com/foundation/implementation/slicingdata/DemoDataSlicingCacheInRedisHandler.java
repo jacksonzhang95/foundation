@@ -1,6 +1,6 @@
 package com.foundation.implementation.slicingdata;
 
-import com.foundation.demo.implementation.slicingdata.domianObj;
+import com.foundation.implementation.slicingdata.domian.DemoObj;
 import com.foundation.implementation.slicingdata.strategy.DataSlicingStrategy;
 import com.foundation.implementation.slicingdata.strategy.DataSlicingStrategyFactory;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class DemoDataSlicingCacheInRedisHandler extends AbstractDataSlicingCache
     @Override
     @SuppressWarnings(value = "unchecked")
     public DataSlicingStrategy<DemoObj, String> getDataSplicingStrategy() {
-        return DataSlicingStrategyFactory.getByName(DataSplicingStrategyConstant_SLICING_DATA_STRATEGY);
+        return DataSlicingStrategyFactory.getByName("");
     }
 
     @Override

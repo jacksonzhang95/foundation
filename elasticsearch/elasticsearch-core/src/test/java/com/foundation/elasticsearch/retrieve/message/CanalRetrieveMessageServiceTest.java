@@ -1,6 +1,5 @@
 package com.foundation.elasticsearch.retrieve.message;
 
-import com.foundation.demo.demo.elastic.search.retrieve.message.CanalClientRetrieveMessageService;
 import com.foundation.elasticsearch.DemoElasticSearchApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;

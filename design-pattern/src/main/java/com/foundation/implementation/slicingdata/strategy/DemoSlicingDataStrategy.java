@@ -1,6 +1,6 @@
 package com.foundation.implementation.slicingdata.strategy;
 
-import com.foundation.demo.implementation.slicingdata.domianObj;
+import com.foundation.implementation.slicingdata.domian.DemoObj;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,6 +23,6 @@ public class DemoSlicingDataStrategy implements DataSlicingStrategy<DemoObj, Str
 
     @Override
     public String getStrategyName() {
-        return DataSplicingStrategyConstant_SLICING_DATA_STRATEGY;
+        return "";
     }
 }
