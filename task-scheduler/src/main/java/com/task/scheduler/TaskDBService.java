@@ -16,11 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskDBService {
 
-    public boolean updateTaskStatus(Long id, TaskStatusEnum taskStatus) {
-        return true;
-    }
-
-    public void updateById(Task updateBean) {
+    public void updateById(Task task) {
 
     }
 

@@ -105,7 +105,8 @@ public abstract class AbstractTaskManager implements TaskManager, DisposableBean
 
         // 更新数据库数据
         task.setTaskStatus(TaskStatusEnum.STARTING);
-        taskDBService.updateTaskStatus(task.getId(), task.getTaskStatus());
+        task.setProcessStartTime(LocalDateTime.now());
+        taskDBService.updateById(task);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.task.scheduler.vo;
+package com.task.scheduler.po;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @description :
  */
 @Data
-public class TaskVO {
+public class TaskPO {
 
     /**
      * 唯一id
