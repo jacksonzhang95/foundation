@@ -2,18 +2,24 @@ package com.task.scheduler.puller;
 
 
 import com.foundation.common.utils.AssertUtils;
+import com.foundation.common.utils.GsonUtils;
 import com.task.scheduler.common.TaskPriorityTypeEnum;
+import com.task.scheduler.common.TaskProcessTypeEnum;
+import com.task.scheduler.common.TaskProviderTypeEnum;
 import com.task.scheduler.entity.Task;
 import com.task.scheduler.exception.ConcurrencyReachesLimitException;
 import com.task.scheduler.executor.TaskExecutor;
 import com.task.scheduler.executor.TaskExecutorFactory;
 import com.task.scheduler.manager.TaskManager;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import javax.swing.*;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -40,27 +46,18 @@ public abstract class AbstractTaskPuller implements TaskPuller {
         AssertUtils.isTrue(Objects.nonNull(getProcessType()));
 
         while (true) {
-            // 先拉后申请
-            String targetQueue = null;
-            String taskCode = null;
-            for (TaskPriorityTypeEnum priorityType : TaskPriorityTypeEnum.values()) {
-                targetQueue = getQueueKey(priorityType);
-                if (Objects.equals(priorityType, TaskPriorityTypeEnum.HIGH)) {
-                    taskCode = redisTemplate.opsForList().leftPop(targetQueue, getWaitHighPriorityTime(), TimeUnit.SECONDS);
-                } else {
-                    taskCode = redisTemplate.opsForList().leftPop(targetQueue, getWaitHighPriorityTime(), TimeUnit.SECONDS);
-                }
-                if (StringUtils.isNotBlank(taskCode)) {
-                    break;
-                }
-            }
+            PullResult pullResult = doPull();
 
-            if (Objects.isNull(taskCode)) {
+            if (Objects.isNull(pullResult)) {
                 log.warn("{} , 没有拉取到任务", this.getClass().getSimpleName());
+                Thread.sleep(getIdleSleepTime());
                 continue;
             }
 
-            log.info("任务拉取，拉取任务成功，目标队列: {}, taskCode: {}", targetQueue, taskCode);
+            String taskCode = pullResult.getTaskCode();
+            String queueName = pullResult.getQueueName();
+
+            log.info("任务拉取，拉取任务成功，目标队列: {}, 任务编码: {}", queueName, taskCode);
 
             Task task = null;
             try {
@@ -79,8 +76,7 @@ public abstract class AbstractTaskPuller implements TaskPuller {
 
             } catch (ConcurrencyReachesLimitException concurrencyReachesLimitException) {
                 log.info("任务拉取，并发数达到上限，taskCode:{} 回到队头，", taskCode);
-                // 回到队头
-                redisTemplate.opsForList().leftPush(targetQueue, taskCode);
+                pushBackWhenFlowControl(pullResult);
                 // 放弃执行任务
                 taskManager.abandonExecuteTask(task);
                 // 执行睡眠，避免快速连续拉取
@@ -88,8 +84,7 @@ public abstract class AbstractTaskPuller implements TaskPuller {
 
             } catch (Exception e) {
                 log.info("任务拉取，提交任务异常，taskCode:{} 回到队尾，异常信息: {}", taskCode, e);
-                // 回到队尾
-                redisTemplate.opsForList().rightPush(targetQueue, taskCode);
+                pushBackWhenError(pullResult);
                 // 放弃执行任务
                 taskManager.abandonExecuteTask(task);
             }
@@ -97,11 +92,33 @@ public abstract class AbstractTaskPuller implements TaskPuller {
         }
     }
 
-    protected abstract ThreadPoolExecutor getThreadPool();
+    protected abstract PullResult doPull();
 
-    protected abstract Long getWaitHighPriorityTime();
+    protected abstract void pushBackWhenFlowControl(PullResult pullResult);
+
+    protected abstract void pushBackWhenError(PullResult pullResult);
 
     protected String getQueueKey(TaskPriorityTypeEnum priorityType) {
         return taskManager.getPullingKey(getProcessType(), priorityType);
+    }
+
+    protected abstract ThreadPoolExecutor getThreadPool();
+
+    protected long getIdleSleepTime() {
+        return 1000L;
+    }
+
+    protected final long getWaitTimeByProcessTypeAndPriorityType(TaskProcessTypeEnum processType, TaskPriorityTypeEnum priorityType) {
+        return 0L;
+    }
+
+    @Data
+    protected class PullResult {
+
+        private String taskCode;
+
+        private String queueName;
+
+        private Long priorityScore;
     }
 }

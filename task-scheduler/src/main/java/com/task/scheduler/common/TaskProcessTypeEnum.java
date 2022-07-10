@@ -34,7 +34,6 @@ public enum TaskProcessTypeEnum {
                 return typeEnum;
             }
         }
-
         return null;
     }
 }
